@@ -211,6 +211,7 @@ public class ManageCustomersFormController {
 
             CustomerDAOImpl customerDAO=new CustomerDAOImpl();
             if (customerDAO.deleteCustomer(id)) {
+                // get Alert
                 new Alert(Alert.AlertType.INFORMATION,"Saved").show();
             }
 
