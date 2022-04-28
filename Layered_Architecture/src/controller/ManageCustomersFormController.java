@@ -173,9 +173,8 @@ public class ManageCustomersFormController {
                 }
 
                 CustomerDAOImpl customerDAO=new CustomerDAOImpl();
-                CustomerDTO dto=new CustomerDTO(id,name,address);
-                if (customerDAO.updateCustomer(dto)) {
-                    new Alert(Alert.AlertType.INFORMATION,"Saved").show();
+                if (customerDAO.updateCustomer(new CustomerDTO(id,name,address))) {
+                    new Alert(Alert.AlertType.INFORMATION,"Updated").show();
                 }
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, "Failed to update the customer " + id + e.getMessage()).show();
@@ -194,10 +193,8 @@ public class ManageCustomersFormController {
 
 
     boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
-        PreparedStatement pstm = connection.prepareStatement("SELECT id FROM Customer WHERE id=?");
-        pstm.setString(1, id);
-        return pstm.executeQuery().next();
+        CustomerDAOImpl customerDAO=new CustomerDAOImpl();
+        return customerDAO.existCustomer(id);
     }
 
 
@@ -211,8 +208,8 @@ public class ManageCustomersFormController {
 
             CustomerDAOImpl customerDAO=new CustomerDAOImpl();
             if (customerDAO.deleteCustomer(id)) {
-                // get Alert
-                new Alert(Alert.AlertType.INFORMATION,"Saved").show();
+               Alert alert= new Alert(Alert.AlertType.INFORMATION,"Deleted");
+               alert.showAndWait();
             }
 
             tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
@@ -228,15 +225,8 @@ public class ManageCustomersFormController {
 
     private String generateNewId() {
         try {
-            Connection connection = DBConnection.getDbConnection().getConnection();
-            ResultSet rst = connection.createStatement().executeQuery("SELECT id FROM Customer ORDER BY id DESC LIMIT 1;");
-            if (rst.next()) {
-                String id = rst.getString("id");
-                int newCustomerId = Integer.parseInt(id.replace("C00-", "")) + 1;
-                return String.format("C00-%03d", newCustomerId);
-            } else {
-                return "C00-001";
-            }
+            CustomerDAOImpl customerDAO=new CustomerDAOImpl();
+            return customerDAO.generateNewId();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
         } catch (ClassNotFoundException e) {
@@ -251,7 +241,6 @@ public class ManageCustomersFormController {
             int newCustomerId = Integer.parseInt(id.replace("C", "")) + 1;
             return String.format("C00-%03d", newCustomerId);
         }
-
     }
 
     private String getLastCustomerId() {
