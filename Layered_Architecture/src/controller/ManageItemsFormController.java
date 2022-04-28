@@ -22,7 +22,10 @@ import view.tdm.ItemTM;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -76,10 +79,10 @@ public class ManageItemsFormController {
         try {
             /*Get all items*/
 
-            ItemDAOImpl itemDAO=new ItemDAOImpl();
+            ItemDAOImpl itemDAO = new ItemDAOImpl();
             ArrayList<ItemDTO> allItems = itemDAO.getAllItems();
-            for (ItemDTO item:allItems) {
-                tblItems.getItems().add(new ItemTM(item.getCode(),item.getDescription(),item.getUnitPrice(),item.getQtyOnHand()));
+            for (ItemDTO item : allItems) {
+                tblItems.getItems().add(new ItemTM(item.getCode(), item.getDescription(), item.getUnitPrice(), item.getQtyOnHand()));
             }
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
@@ -137,7 +140,7 @@ public class ManageItemsFormController {
                 new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
             }
 
-            ItemDAOImpl itemDAO=new ItemDAOImpl();
+            ItemDAOImpl itemDAO = new ItemDAOImpl();
             if (itemDAO.deleteItem(code)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted");
                 alert.showAndWait();
@@ -181,13 +184,12 @@ public class ManageItemsFormController {
                     new Alert(Alert.AlertType.ERROR, code + " already exists").show();
                 }
                 //Save Item
-                Connection connection = DBConnection.getDbConnection().getConnection();
-                PreparedStatement pstm = connection.prepareStatement("INSERT INTO Item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)");
-                pstm.setString(1, code);
-                pstm.setString(2, description);
-                pstm.setBigDecimal(3, unitPrice);
-                pstm.setInt(4, qtyOnHand);
-                pstm.executeUpdate();
+                ItemDAOImpl itemDAO=new ItemDAOImpl();
+                if (itemDAO.saveItem(new ItemDTO(code,description,unitPrice,qtyOnHand))) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Saved");
+                    alert.showAndWait();
+                }
+
                 tblItems.getItems().add(new ItemTM(code, description, unitPrice, qtyOnHand));
 
             } catch (SQLException e) {
