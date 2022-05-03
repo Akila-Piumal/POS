@@ -2,6 +2,7 @@ package controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import dao.CustomerDAO;
 import dao.CustomerDAOImpl;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -71,8 +72,7 @@ public class ManageCustomersFormController {
         tblCustomers.getItems().clear();
         /*Get all customers*/
         try {
-
-            CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+            CustomerDAO customerDAO=new CustomerDAOImpl();
             ArrayList<CustomerDTO> allCustomers = customerDAO.getAllCustomers();
 
             for (CustomerDTO customer : allCustomers) {
@@ -148,7 +148,7 @@ public class ManageCustomersFormController {
                     new Alert(Alert.AlertType.ERROR, id + " already exists").show();
                 }
 
-                CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+                CustomerDAO customerDAO=new CustomerDAOImpl();
                 if (customerDAO.saveCustomer(id, name, address)) {
                     new Alert(Alert.AlertType.INFORMATION, "Saved.").show();
                 }
@@ -168,7 +168,7 @@ public class ManageCustomersFormController {
                     new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
                 }
 
-                CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+                CustomerDAO customerDAO=new CustomerDAOImpl();
                 if (customerDAO.updateCustomer(new CustomerDTO(id, name, address))) {
                     new Alert(Alert.AlertType.INFORMATION, "Updated").show();
                 }
@@ -202,7 +202,7 @@ public class ManageCustomersFormController {
                 new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
             }
 
-            CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+            CustomerDAO customerDAO=new CustomerDAOImpl();
             if (customerDAO.deleteCustomer(id)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted");
                 alert.showAndWait();
@@ -221,7 +221,7 @@ public class ManageCustomersFormController {
 
     private String generateNewId() {
         try {
-            CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+            CustomerDAO customerDAO=new CustomerDAOImpl();
             return customerDAO.generateNewId();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new id " + e.getMessage()).show();
