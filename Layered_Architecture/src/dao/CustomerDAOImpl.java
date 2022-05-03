@@ -29,7 +29,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public boolean saveCustomer(String id, String name, String address) throws SQLException, ClassNotFoundException {
-        return SQLUtil.executeUpdate("INSERT INTO Customer (id,name, address) VALUES (?,?,?)", id, name, address);
+        return SQLUtil.executeUpdate("INSERT INTO Customer VALUES (?,?,?)", id, name, address);
     }
 
     @Override

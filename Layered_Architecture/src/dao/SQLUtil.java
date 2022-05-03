@@ -12,7 +12,7 @@ public class SQLUtil {
         Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement(sql);
         for (int i = 0; i < args.length; i++) {
-            pstm.setObject((i + 1), args[i]);
+            pstm.setObject(i + 1, args[i]);
         }
         return pstm;
 
