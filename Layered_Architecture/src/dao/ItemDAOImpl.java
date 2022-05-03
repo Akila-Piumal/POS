@@ -47,7 +47,7 @@ public class ItemDAOImpl {
         pstm.setBigDecimal(2, itemDTO.getUnitPrice());
         pstm.setInt(3, itemDTO.getQtyOnHand());
         pstm.setString(4, itemDTO.getCode());
-        return pstm.executeUpdate()>0;
+        return pstm.executeUpdate() > 0;
     }
 
     public boolean existItem(String code) throws SQLException, ClassNotFoundException {
