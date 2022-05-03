@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public interface CustomerDAO {
+
     ArrayList<CustomerDTO> getAllCustomers() throws SQLException, ClassNotFoundException;
 
     boolean saveCustomer(String id, String name, String address) throws SQLException, ClassNotFoundException;
@@ -17,4 +18,6 @@ public interface CustomerDAO {
     String generateNewId() throws SQLException, ClassNotFoundException;
 
     boolean existCustomer(String id) throws SQLException, ClassNotFoundException;
+
+    CustomerDTO searchCustomer(String id) throws SQLException, ClassNotFoundException;
 }
