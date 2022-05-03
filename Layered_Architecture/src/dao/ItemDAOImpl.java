@@ -69,5 +69,14 @@ public class ItemDAOImpl {
         }
     }
 
+    public ItemDTO findItem(String code) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getDbConnection().getConnection();
+        PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Item WHERE code=?");
+        pstm.setString(1, code);
+        ResultSet rst = pstm.executeQuery();
+        rst.next();
+        return new ItemDTO(code, rst.getString("description"), rst.getBigDecimal("unitPrice"), rst.getInt("qtyOnHand"));
+    }
+
 
 }
