@@ -3,10 +3,7 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import dao.CrudDAO;
-import dao.CustomerDAOImpl;
-import dao.ItemDAOImpl;
-import dao.OrderDAOImpl;
+import dao.*;
 import db.DBConnection;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -63,6 +60,7 @@ public class PlaceOrderFormController {
     CrudDAO<CustomerDTO, String> customerDAO = new CustomerDAOImpl();
     CrudDAO<ItemDTO, String> itemDAO = new ItemDAOImpl();
     CrudDAO<OrderDTO, String> orderDAO = new OrderDAOImpl();
+    CrudDAO<OrderDetailDTO, String> orderDetailsDAO = new OrderDetailsDAOImpl();
     private String orderId;
 
     public void initialize() throws SQLException, ClassNotFoundException {
@@ -297,7 +295,7 @@ public class PlaceOrderFormController {
 
     public void btnPlaceOrder_OnAction(ActionEvent actionEvent) {
         boolean b = saveOrder(orderId, LocalDate.now(), cmbCustomerId.getValue(),
-                tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO(tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
+                tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO(orderId,tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
 
         if (b) {
             new Alert(Alert.AlertType.INFORMATION, "Order has been placed successfully").show();
@@ -315,55 +313,37 @@ public class PlaceOrderFormController {
     }
 
     public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) {
-        /*Transaction*/
-        Connection connection = null;
+        // Transaction
+
         try {
-            connection = DBConnection.getDbConnection().getConnection();
-            PreparedStatement stm = connection.prepareStatement("SELECT oid FROM `Orders` WHERE oid=?");
-            stm.setString(1, orderId);
-            /*if order id already exist*/
-            if (stm.executeQuery().next()) {
+            Connection connection=DBConnection.getDbConnection().getConnection();
+            // if order id already exist
+            if (orderDAO.exist(orderId)) {
 
             }
 
             connection.setAutoCommit(false);
-            stm = connection.prepareStatement("INSERT INTO `Orders` (oid, date, customerID) VALUES (?,?,?)");
-            stm.setString(1, orderId);
-            stm.setDate(2, Date.valueOf(orderDate));
-            stm.setString(3, customerId);
 
-            if (stm.executeUpdate() != 1) {
+            if (!orderDAO.save(new OrderDTO(orderId, orderDate, customerId))) {
                 connection.rollback();
                 connection.setAutoCommit(true);
                 return false;
             }
 
-            stm = connection.prepareStatement("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)");
-
             for (OrderDetailDTO detail : orderDetails) {
-                stm.setString(1, orderId);
-                stm.setString(2, detail.getItemCode());
-                stm.setBigDecimal(3, detail.getUnitPrice());
-                stm.setInt(4, detail.getQty());
+                boolean save = orderDetailsDAO.save(detail);
 
-                if (stm.executeUpdate() != 1) {
+                if (!save) {
                     connection.rollback();
                     connection.setAutoCommit(true);
                     return false;
                 }
 
-//                //Search & Update Item
-
+                //Search & Update Item
                 ItemDTO item = itemDAO.search(detail.getItemCode());
                 item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
 
-                PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
-                pstm.setString(1, item.getDescription());
-                pstm.setBigDecimal(2, item.getUnitPrice());
-                pstm.setInt(3, item.getQtyOnHand());
-                pstm.setString(4, item.getCode());
-
-                if (!(pstm.executeUpdate() > 0)) {
+                if (!itemDAO.update(item)) {
                     connection.rollback();
                     connection.setAutoCommit(true);
                     return false;
@@ -378,6 +358,7 @@ public class PlaceOrderFormController {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return false;
     }

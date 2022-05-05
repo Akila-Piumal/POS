@@ -77,7 +77,7 @@ public class ManageItemsFormController {
     private void loadAllItems() {
         tblItems.getItems().clear();
         try {
-            /*Get all items*/
+            // Get all items
             ArrayList<ItemDTO> allItems = itemDAO.getAll();
 
             for (ItemDTO item : allItems) {
@@ -132,7 +132,7 @@ public class ManageItemsFormController {
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
-        /*Delete Item*/
+        // Delete Item
         String code = tblItems.getSelectionModel().getSelectedItem().getCode();
         try {
             if (!existItem(code)) {
@@ -174,7 +174,6 @@ public class ManageItemsFormController {
         int qtyOnHand = Integer.parseInt(txtQtyOnHand.getText());
         BigDecimal unitPrice = new BigDecimal(txtUnitPrice.getText()).setScale(2);
 
-
         if (btnSave.getText().equalsIgnoreCase("save")) {
             try {
                 if (existItem(code)) {
@@ -185,7 +184,6 @@ public class ManageItemsFormController {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION, "Saved");
                     alert.showAndWait();
                 }
-
                 tblItems.getItems().add(new ItemTM(code, description, unitPrice, qtyOnHand));
 
             } catch (SQLException e) {
@@ -195,11 +193,10 @@ public class ManageItemsFormController {
             }
         } else {
             try {
-
                 if (!existItem(code)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
                 }
-                /*Update Item*/
+                // Update Item
                 if (itemDAO.update(new ItemDTO(code, description, unitPrice, qtyOnHand))) {
                     new Alert(Alert.AlertType.INFORMATION, "Updated.").show();
                 }
@@ -226,8 +223,6 @@ public class ManageItemsFormController {
     private String generateNewId() {
         try {
             return itemDAO.generateNewId();
-
-
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
         } catch (ClassNotFoundException e) {
