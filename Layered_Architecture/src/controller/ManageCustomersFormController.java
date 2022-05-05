@@ -2,7 +2,7 @@ package controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import dao.CustomerDAO;
+import dao.CrudDAO;
 import dao.CustomerDAOImpl;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -42,7 +42,7 @@ public class ManageCustomersFormController {
     public JFXButton btnAddNewCustomer;
 
     // Property Injection (DI)
-    private final CustomerDAO customerDAO=new CustomerDAOImpl();
+    private final CrudDAO<CustomerDTO,String> customerDAO=new CustomerDAOImpl();
 
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -75,7 +75,7 @@ public class ManageCustomersFormController {
         tblCustomers.getItems().clear();
         /*Get all customers*/
         try {
-            ArrayList<CustomerDTO> allCustomers = customerDAO.getAllCustomers();
+            ArrayList<CustomerDTO> allCustomers = customerDAO.getAll();
 
             for (CustomerDTO customer : allCustomers) {
                 tblCustomers.getItems().add(new CustomerTM(customer.getId(), customer.getName(), customer.getAddress()));
@@ -145,8 +145,8 @@ public class ManageCustomersFormController {
                 if (existCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, id + " already exists").show();
                 }
-
-                if (customerDAO.saveCustomer(id, name, address)) {
+                CustomerDTO dto=new CustomerDTO(id,name,address);
+                if (customerDAO.save(dto)) {
                     new Alert(Alert.AlertType.INFORMATION, "Saved.").show();
                 }
 
@@ -165,7 +165,7 @@ public class ManageCustomersFormController {
                     new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
                 }
 
-                if (customerDAO.updateCustomer(new CustomerDTO(id, name, address))) {
+                if (customerDAO.update(new CustomerDTO(id, name, address))) {
                     new Alert(Alert.AlertType.INFORMATION, "Updated").show();
                 }
             } catch (SQLException e) {
@@ -184,7 +184,7 @@ public class ManageCustomersFormController {
     }
 
     boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
-        return customerDAO.existCustomer(id);
+        return customerDAO.exist(id);
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
@@ -195,7 +195,7 @@ public class ManageCustomersFormController {
                 new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
             }
 
-            if (customerDAO.deleteCustomer(id)) {
+            if (customerDAO.delete(id)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted");
                 alert.showAndWait();
             }

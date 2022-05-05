@@ -3,7 +3,10 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import dao.*;
+import dao.CrudDAO;
+import dao.CustomerDAOImpl;
+import dao.ItemDAOImpl;
+import dao.OrderDAOImpl;
 import db.DBConnection;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -19,6 +22,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.CustomerDTO;
 import model.ItemDTO;
+import model.OrderDTO;
 import model.OrderDetailDTO;
 import view.tdm.OrderDetailTM;
 
@@ -56,9 +60,9 @@ public class PlaceOrderFormController {
     public Label lblId;
     public Label lblDate;
     public Label lblTotal;
-    CustomerDAO customerDAO = new CustomerDAOImpl();
-    ItemDAO itemDAO = new ItemDAOImpl();
-    placeOrderDAO placeOrderDAO = new PlaceOrderDAOImpl();
+    CrudDAO<CustomerDTO, String> customerDAO = new CustomerDAOImpl();
+    CrudDAO<ItemDTO, String> itemDAO = new ItemDAOImpl();
+    CrudDAO<OrderDTO, String> orderDAO = new OrderDAOImpl();
     private String orderId;
 
     public void initialize() throws SQLException, ClassNotFoundException {
@@ -107,12 +111,12 @@ public class PlaceOrderFormController {
                     /*Search Customer*/
 
                     try {
-                        if (!customerDAO.existCustomer(newValue + "")) {
+                        if (!customerDAO.exist(newValue + "")) {
 //                            "There is no such customer associated with the id " + id
                             new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + newValue + "").show();
                         }
 
-                        CustomerDTO dto = customerDAO.searchCustomer(newValue);
+                        CustomerDTO dto = customerDAO.search(newValue);
                         txtCustomerName.setText(dto.getName());
                     } catch (SQLException e) {
                         new Alert(Alert.AlertType.ERROR, "Failed to find the customer " + newValue + "" + e).show();
@@ -135,16 +139,17 @@ public class PlaceOrderFormController {
 
                 /*Find Item*/
                 try {
-                    if (!itemDAO.existItem(newItemCode + "")) {
+                    if (!itemDAO.exist(newItemCode + "")) {
 //                        throw new NotFoundException("There is no such item associated with the id " + code);
                     }
 
-                    ItemDTO item = itemDAO.findItem(newItemCode);
+                    // search Item
+                    ItemDTO item = itemDAO.search(newItemCode);
 
                     txtDescription.setText(item.getDescription());
                     txtUnitPrice.setText(item.getUnitPrice().setScale(2).toString());
 
-//                    txtQtyOnHand.setText(tblOrderDetails.getItems().stream().filter(detail-> detail.getCode().equals(item.getCode())).<Integer>map(detail-> item.getQtyOnHand() - detail.getQty()).findFirst().orElse(item.getQtyOnHand()) + "");
+//                  txtQtyOnHand.setText(tblOrderDetails.getItems().stream().filter(detail-> detail.getCode().equals(item.getCode())).<Integer>map(detail-> item.getQtyOnHand() - detail.getQty()).findFirst().orElse(item.getQtyOnHand()) + "");
                     Optional<OrderDetailTM> optOrderDetail = tblOrderDetails.getItems().stream().filter(detail -> detail.getCode().equals(newItemCode)).findFirst();
                     txtQtyOnHand.setText((optOrderDetail.isPresent() ? item.getQtyOnHand() - optOrderDetail.get().getQty() : item.getQtyOnHand()) + "");
 
@@ -185,7 +190,7 @@ public class PlaceOrderFormController {
 
     public String generateNewOrderId() {
         try {
-            return placeOrderDAO.generateNewId();
+            return orderDAO.generateNewId();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new order id").show();
         } catch (ClassNotFoundException e) {
@@ -196,7 +201,7 @@ public class PlaceOrderFormController {
 
     private void loadAllCustomerIds() {
         try {
-            ArrayList<CustomerDTO> allCustomers = customerDAO.getAllCustomers();
+            ArrayList<CustomerDTO> allCustomers = customerDAO.getAll();
 
             for (CustomerDTO customer : allCustomers) {
                 cmbCustomerId.getItems().add(customer.getId());
@@ -212,7 +217,7 @@ public class PlaceOrderFormController {
     private void loadAllItemCodes() {
         try {
             /*Get all items*/
-            ArrayList<ItemDTO> allItems = itemDAO.getAllItems();
+            ArrayList<ItemDTO> allItems = itemDAO.getAll();
 
             for (ItemDTO item : allItems) {
                 cmbItemCode.getItems().add(item.getCode());
@@ -349,7 +354,7 @@ public class PlaceOrderFormController {
 
 //                //Search & Update Item
 
-                ItemDTO item = itemDAO.findItem(detail.getItemCode());
+                ItemDTO item = itemDAO.search(detail.getItemCode());
                 item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
 
                 PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
