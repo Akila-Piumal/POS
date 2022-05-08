@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ItemDAOImpl implements CrudDAO<ItemDTO,String>{
+public class ItemDAOImpl implements CrudDAO<ItemDTO,String> , ItemDAO{
     @Override
     public ArrayList<ItemDTO> getAll() throws SQLException, ClassNotFoundException {
 
@@ -63,4 +63,13 @@ public class ItemDAOImpl implements CrudDAO<ItemDTO,String>{
         }
     }
 
+    @Override
+    public ArrayList<ItemDTO> searchByPriceRange(double min, double max) throws SQLException, ClassNotFoundException {
+        ResultSet resultSet = SQLUtil.executeQuery("SELECT * FROM Item WHERE unitPrice BETWEEN ? AND ?", min, max);
+        ArrayList<ItemDTO> itemList=new ArrayList<>();
+        while (resultSet.next()){
+            itemList.add(new ItemDTO(resultSet.getString(1),resultSet.getString(2),resultSet.getBigDecimal(4),resultSet.getInt(3)));
+        }
+        return itemList;
+    }
 }
