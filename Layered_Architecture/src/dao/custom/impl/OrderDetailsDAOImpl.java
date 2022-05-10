@@ -1,11 +1,13 @@
-package dao;
+package dao.custom.impl;
 
+import dao.SQLUtil;
+import dao.custom.OrderDetailsDAO;
 import model.OrderDetailDTO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class OrderDetailsDAOImpl implements OrderDetailsDAO{
+public class OrderDetailsDAOImpl implements OrderDetailsDAO {
     @Override
     public ArrayList<OrderDetailDTO> getAll() throws SQLException, ClassNotFoundException {
         return null;
@@ -13,7 +15,6 @@ public class OrderDetailsDAOImpl implements OrderDetailsDAO{
 
     @Override
     public boolean save(OrderDetailDTO dto) throws SQLException, ClassNotFoundException {
-//        stm = connection.prepareStatement("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)");
         return SQLUtil.executeUpdate("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)",dto.getOid(),dto.getItemCode(),dto.getUnitPrice(),dto.getQty());
     }
 
