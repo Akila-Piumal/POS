@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class OrderDAOImpl implements CrudDAO<OrderDTO,String> , OrderDAO{
+public class OrderDAOImpl implements OrderDAO{
     @Override
     public ArrayList<OrderDTO> getAll() throws SQLException, ClassNotFoundException {
         return null;

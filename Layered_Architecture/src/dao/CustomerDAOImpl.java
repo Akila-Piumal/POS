@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @since : 0.1.0
  **/
 
-public class CustomerDAOImpl implements CrudDAO<CustomerDTO,String> , CustomerDAO{
+public class CustomerDAOImpl implements CustomerDAO{
 
     @Override
     public ArrayList<CustomerDTO> getAll() throws SQLException, ClassNotFoundException {
@@ -71,20 +71,22 @@ public class CustomerDAOImpl implements CrudDAO<CustomerDTO,String> , CustomerDA
     }
 
     @Override
-    public CustomerDTO searchByName(String name) throws SQLException, ClassNotFoundException {
+    public ArrayList<CustomerDTO> searchByName(String name) throws SQLException, ClassNotFoundException {
         ResultSet rst = SQLUtil.executeQuery("SELECT * FROM Customer WHERE name=?", name);
-        if (rst.next()){
-            return new CustomerDTO(rst.getString(1),rst.getString(2),rst.getString(3));
+        ArrayList<CustomerDTO> customerList=new ArrayList<>();
+        while (rst.next()){
+            customerList.add(new CustomerDTO(rst.getString(1),rst.getString(2),rst.getString(3)));
         }
-        return null;
+        return customerList;
     }
 
     @Override
-    public CustomerDTO searchByAddress(String address) throws SQLException, ClassNotFoundException {
+    public ArrayList<CustomerDTO> searchByAddress(String address) throws SQLException, ClassNotFoundException {
         ResultSet resultSet = SQLUtil.executeQuery("SELECT * FROM Customer WHERE address=?", address);
+        ArrayList<CustomerDTO> customerList=new ArrayList<>();
         if (resultSet.next()){
-            return new CustomerDTO(resultSet.getString(1),resultSet.getString(2),resultSet.getString(3));
+            customerList.add(new CustomerDTO(resultSet.getString(1),resultSet.getString(2),resultSet.getString(3)));
         }
-        return null;
+        return customerList;
     }
 }
