@@ -56,11 +56,11 @@ public class PlaceOrderFormController {
     public Label lblId;
     public Label lblDate;
     public Label lblTotal;
-    CustomerDAO customerDAO = new CustomerDAOImpl();
-    ItemDAO itemDAO = new ItemDAOImpl();
-    OrderDAO orderDAO = new OrderDAOImpl();
-    OrderDetailsDAO orderDetailsDAO = new OrderDetailsDAOImpl();
-    QueryDAO queryDAO=new QueryDAOImpl();
+//    private final CustomerDAO customerDAO = new CustomerDAOImpl();
+//    private final ItemDAO itemDAO = new ItemDAOImpl();
+//    private final OrderDAO orderDAO = new OrderDAOImpl();
+//    private final OrderDetailsDAO orderDetailsDAO = new OrderDetailsDAOImpl();
+//    private final QueryDAO queryDAO=new QueryDAOImpl();
 
     private String orderId;
 
@@ -314,54 +314,54 @@ public class PlaceOrderFormController {
     }
 
     public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) {
-        // Transaction
-
-        try {
-            Connection connection=DBConnection.getDbConnection().getConnection();
-            // if order id already exist
-            if (orderDAO.exist(orderId)) {
-
-            }
-
-            connection.setAutoCommit(false);
-
-            if (!orderDAO.save(new OrderDTO(orderId, orderDate, customerId))) {
-                connection.rollback();
-                connection.setAutoCommit(true);
-                return false;
-            }
-
-            for (OrderDetailDTO detail : orderDetails) {
-                boolean save = orderDetailsDAO.save(detail);
-
-                if (!save) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    return false;
-                }
-
-                //Search & Update Item
-                ItemDTO item = itemDAO.search(detail.getItemCode());
-                item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
-
-                if (!itemDAO.update(item)) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    return false;
-                }
-            }
-
-            connection.commit();
-            connection.setAutoCommit(true);
-            return true;
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-        return false;
+//        // Transaction
+//
+//        try {
+//            Connection connection=DBConnection.getDbConnection().getConnection();
+//            // if order id already exist
+//            if (orderDAO.exist(orderId)) {
+//
+//            }
+//
+//            connection.setAutoCommit(false);
+//
+//            if (!orderDAO.save(new OrderDTO(orderId, orderDate, customerId))) {
+//                connection.rollback();
+//                connection.setAutoCommit(true);
+//                return false;
+//            }
+//
+//            for (OrderDetailDTO detail : orderDetails) {
+//                boolean save = orderDetailsDAO.save(detail);
+//
+//                if (!save) {
+//                    connection.rollback();
+//                    connection.setAutoCommit(true);
+//                    return false;
+//                }
+//
+//                //Search & Update Item
+//                ItemDTO item = itemDAO.search(detail.getItemCode());
+//                item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
+//
+//                if (!itemDAO.update(item)) {
+//                    connection.rollback();
+//                    connection.setAutoCommit(true);
+//                    return false;
+//                }
+//            }
+//
+//            connection.commit();
+//            connection.setAutoCommit(true);
+//            return true;
+//
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//            System.out.println(e.getMessage());
+//        }
+//        return false;
     }
 
 }
