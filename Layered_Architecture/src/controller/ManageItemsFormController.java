@@ -1,11 +1,9 @@
 package controller;
 
-import bo.ManageItemsBO;
-import bo.ManageItemsBOImpl;
+import bo.ItemBO;
+import bo.ItemBOImpl;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import dao.custom.ItemDAO;
-import dao.custom.impl.ItemDAOImpl;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,7 +40,7 @@ public class ManageItemsFormController {
     public TableView<ItemTM> tblItems;
     public JFXTextField txtUnitPrice;
     public JFXButton btnAddNewItem;
-    ManageItemsBO manageItemsBO= new ManageItemsBOImpl();
+    ItemBO itemBO= new ItemBOImpl();
 
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
@@ -78,7 +76,7 @@ public class ManageItemsFormController {
         tblItems.getItems().clear();
         try {
             // Get all items
-            ArrayList<ItemDTO> allItems = manageItemsBO.getAllItems();
+            ArrayList<ItemDTO> allItems = itemBO.getAllItems();
 
             for (ItemDTO item : allItems) {
                 tblItems.getItems().add(new ItemTM(item.getCode(), item.getDescription(), item.getUnitPrice(), item.getQtyOnHand()));
@@ -135,11 +133,11 @@ public class ManageItemsFormController {
         // Delete Item
         String code = tblItems.getSelectionModel().getSelectedItem().getCode();
         try {
-            if (!manageItemsBO.checkItemIsAvailable(code)) {
+            if (!itemBO.checkItemIsAvailable(code)) {
                 new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
             }
 
-            if (manageItemsBO.deleteItem(code)) {
+            if (itemBO.deleteItem(code)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted");
                 alert.showAndWait();
             }
@@ -180,7 +178,7 @@ public class ManageItemsFormController {
                     new Alert(Alert.AlertType.ERROR, code + " already exists").show();
                 }
                 //Save Item
-                if (manageItemsBO.saveItem(new ItemDTO(code, description, unitPrice, qtyOnHand))) {
+                if (itemBO.saveItem(new ItemDTO(code, description, unitPrice, qtyOnHand))) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION, "Saved");
                     alert.showAndWait();
                 }
@@ -193,11 +191,11 @@ public class ManageItemsFormController {
             }
         } else {
             try {
-                if (!manageItemsBO.checkItemIsAvailable(code)) {
+                if (!itemBO.checkItemIsAvailable(code)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
                 }
                 // Update Item
-                if (manageItemsBO.updateItem(new ItemDTO(code, description, unitPrice, qtyOnHand))) {
+                if (itemBO.updateItem(new ItemDTO(code, description, unitPrice, qtyOnHand))) {
                     new Alert(Alert.AlertType.INFORMATION, "Updated.").show();
                 }
 
@@ -217,12 +215,12 @@ public class ManageItemsFormController {
     }
 
     private boolean existItem(String code) throws SQLException, ClassNotFoundException {
-        return manageItemsBO.checkItemIsAvailable(code);
+        return itemBO.checkItemIsAvailable(code);
     }
 
     private String generateNewId() {
         try {
-            return manageItemsBO.generateNewId();
+            return itemBO.generateNewId();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
         } catch (ClassNotFoundException e) {

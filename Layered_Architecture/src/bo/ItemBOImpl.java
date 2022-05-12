@@ -7,7 +7,7 @@ import model.ItemDTO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class ManageItemsBOImpl implements ManageItemsBO {
+public class ItemBOImpl implements ItemBO {
     ItemDAO itemDAO=new ItemDAOImpl();
 
     @Override
