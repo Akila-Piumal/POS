@@ -1,5 +1,6 @@
 package controller;
 
+import bo.PurchaseOrderBOImpl;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
@@ -110,12 +111,13 @@ public class PlaceOrderFormController {
                     /*Search Customer*/
 
                     try {
-                        if (!customerDAO.exist(newValue + "")) {
+                        PurchaseOrderBOImpl purchaseOrderBO= new PurchaseOrderBOImpl();
+                        if (!purchaseOrderBO.checkCustomerIsAvailable(newValue + "")) {
 //                            "There is no such customer associated with the id " + id
                             new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + newValue + "").show();
                         }
 
-                        CustomerDTO dto = customerDAO.search(newValue);
+                        CustomerDTO dto = purchaseOrderBO.searchCustomer(newValue + "");
                         txtCustomerName.setText(dto.getName());
                     } catch (SQLException e) {
                         new Alert(Alert.AlertType.ERROR, "Failed to find the customer " + newValue + "" + e).show();
@@ -138,12 +140,13 @@ public class PlaceOrderFormController {
 
                 /*Find Item*/
                 try {
-                    if (!itemDAO.exist(newItemCode + "")) {
+                    PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
+                    if (!purchaseOrderBO.checkItemIsAvailable(newItemCode +"")) {
 //                        throw new NotFoundException("There is no such item associated with the id " + code);
                     }
 
                     // search Item
-                    ItemDTO item = itemDAO.search(newItemCode);
+                    ItemDTO item = purchaseOrderBO.searchItem(newItemCode + "");
 
                     txtDescription.setText(item.getDescription());
                     txtUnitPrice.setText(item.getUnitPrice().setScale(2).toString());
@@ -189,7 +192,8 @@ public class PlaceOrderFormController {
 
     public String generateNewOrderId() {
         try {
-            return orderDAO.generateNewId();
+            PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
+            return purchaseOrderBO.generateNewOrderID();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new order id").show();
         } catch (ClassNotFoundException e) {
@@ -200,7 +204,8 @@ public class PlaceOrderFormController {
 
     private void loadAllCustomerIds() {
         try {
-            ArrayList<CustomerDTO> allCustomers = customerDAO.getAll();
+            PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
+            ArrayList<CustomerDTO> allCustomers = purchaseOrderBO.getAllCustomers();
 
             for (CustomerDTO customer : allCustomers) {
                 cmbCustomerId.getItems().add(customer.getId());
@@ -216,7 +221,8 @@ public class PlaceOrderFormController {
     private void loadAllItemCodes() {
         try {
             /*Get all items*/
-            ArrayList<ItemDTO> allItems = itemDAO.getAll();
+            PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
+            ArrayList<ItemDTO> allItems = purchaseOrderBO.getAllItems();
 
             for (ItemDTO item : allItems) {
                 cmbItemCode.getItems().add(item.getCode());
@@ -314,54 +320,14 @@ public class PlaceOrderFormController {
     }
 
     public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) {
-//        // Transaction
-//
-//        try {
-//            Connection connection=DBConnection.getDbConnection().getConnection();
-//            // if order id already exist
-//            if (orderDAO.exist(orderId)) {
-//
-//            }
-//
-//            connection.setAutoCommit(false);
-//
-//            if (!orderDAO.save(new OrderDTO(orderId, orderDate, customerId))) {
-//                connection.rollback();
-//                connection.setAutoCommit(true);
-//                return false;
-//            }
-//
-//            for (OrderDetailDTO detail : orderDetails) {
-//                boolean save = orderDetailsDAO.save(detail);
-//
-//                if (!save) {
-//                    connection.rollback();
-//                    connection.setAutoCommit(true);
-//                    return false;
-//                }
-//
-//                //Search & Update Item
-//                ItemDTO item = itemDAO.search(detail.getItemCode());
-//                item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
-//
-//                if (!itemDAO.update(item)) {
-//                    connection.rollback();
-//                    connection.setAutoCommit(true);
-//                    return false;
-//                }
-//            }
-//
-//            connection.commit();
-//            connection.setAutoCommit(true);
-//            return true;
-//
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//            System.out.println(e.getMessage());
-//        }
-//        return false;
+        PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
+        try {
+            return purchaseOrderBO.purchaseOrder(orderId,orderDate,customerId,orderDetails);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-
 }
