@@ -1,12 +1,10 @@
 package controller;
 
+import bo.PurchaseOrderBO;
 import bo.PurchaseOrderBOImpl;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import dao.custom.*;
-import dao.custom.impl.*;
-import db.DBConnection;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.ActionEvent;
@@ -21,14 +19,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import model.CustomerDTO;
 import model.ItemDTO;
-import model.OrderDTO;
 import model.OrderDetailDTO;
 import view.tdm.OrderDetailTM;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,13 +53,8 @@ public class PlaceOrderFormController {
     public Label lblId;
     public Label lblDate;
     public Label lblTotal;
-//    private final CustomerDAO customerDAO = new CustomerDAOImpl();
-//    private final ItemDAO itemDAO = new ItemDAOImpl();
-//    private final OrderDAO orderDAO = new OrderDAOImpl();
-//    private final OrderDetailsDAO orderDetailsDAO = new OrderDetailsDAOImpl();
-//    private final QueryDAO queryDAO=new QueryDAOImpl();
-
     private String orderId;
+    PurchaseOrderBO purchaseOrderBO=new PurchaseOrderBOImpl();
 
     public void initialize() throws SQLException, ClassNotFoundException {
 
@@ -109,9 +100,7 @@ public class PlaceOrderFormController {
             if (newValue != null) {
                 try {
                     /*Search Customer*/
-
                     try {
-                        PurchaseOrderBOImpl purchaseOrderBO= new PurchaseOrderBOImpl();
                         if (!purchaseOrderBO.checkCustomerIsAvailable(newValue + "")) {
 //                            "There is no such customer associated with the id " + id
                             new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + newValue + "").show();
@@ -119,6 +108,7 @@ public class PlaceOrderFormController {
 
                         CustomerDTO dto = purchaseOrderBO.searchCustomer(newValue + "");
                         txtCustomerName.setText(dto.getName());
+
                     } catch (SQLException e) {
                         new Alert(Alert.AlertType.ERROR, "Failed to find the customer " + newValue + "" + e).show();
                     }
@@ -140,8 +130,7 @@ public class PlaceOrderFormController {
 
                 /*Find Item*/
                 try {
-                    PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
-                    if (!purchaseOrderBO.checkItemIsAvailable(newItemCode +"")) {
+                    if (!purchaseOrderBO.checkItemIsAvailable(newItemCode + "")) {
 //                        throw new NotFoundException("There is no such item associated with the id " + code);
                     }
 
@@ -192,8 +181,8 @@ public class PlaceOrderFormController {
 
     public String generateNewOrderId() {
         try {
-            PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
             return purchaseOrderBO.generateNewOrderID();
+
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to generate a new order id").show();
         } catch (ClassNotFoundException e) {
@@ -204,7 +193,6 @@ public class PlaceOrderFormController {
 
     private void loadAllCustomerIds() {
         try {
-            PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
             ArrayList<CustomerDTO> allCustomers = purchaseOrderBO.getAllCustomers();
 
             for (CustomerDTO customer : allCustomers) {
@@ -221,7 +209,6 @@ public class PlaceOrderFormController {
     private void loadAllItemCodes() {
         try {
             /*Get all items*/
-            PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
             ArrayList<ItemDTO> allItems = purchaseOrderBO.getAllItems();
 
             for (ItemDTO item : allItems) {
@@ -302,7 +289,7 @@ public class PlaceOrderFormController {
 
     public void btnPlaceOrder_OnAction(ActionEvent actionEvent) {
         boolean b = saveOrder(orderId, LocalDate.now(), cmbCustomerId.getValue(),
-                tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO(orderId,tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
+                tblOrderDetails.getItems().stream().map(tm -> new OrderDetailDTO(orderId, tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
 
         if (b) {
             new Alert(Alert.AlertType.INFORMATION, "Order has been placed successfully").show();
@@ -320,9 +307,8 @@ public class PlaceOrderFormController {
     }
 
     public boolean saveOrder(String orderId, LocalDate orderDate, String customerId, List<OrderDetailDTO> orderDetails) {
-        PurchaseOrderBOImpl purchaseOrderBO = new PurchaseOrderBOImpl();
         try {
-            return purchaseOrderBO.purchaseOrder(orderId,orderDate,customerId,orderDetails);
+            return purchaseOrderBO.purchaseOrder(orderId, orderDate, customerId, orderDetails);
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
