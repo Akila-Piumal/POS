@@ -1,5 +1,6 @@
 package controller;
 
+import bo.BOFactory;
 import bo.custom.CustomerBO;
 import bo.custom.impl.CustomerBOImpl;
 import com.jfoenix.controls.JFXButton;
@@ -40,9 +41,7 @@ public class ManageCustomersFormController {
     public JFXTextField txtCustomerAddress;
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
-
-    // Property Injection (DI)
-    CustomerBO customerBO=new CustomerBOImpl();
+    CustomerBO customerBO = (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
 
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -146,7 +145,7 @@ public class ManageCustomersFormController {
                 if (existCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, id + " already exists").show();
                 }
-                CustomerDTO dto=new CustomerDTO(id,name,address);
+                CustomerDTO dto = new CustomerDTO(id, name, address);
                 if (customerBO.saveCustomer(dto)) {
                     new Alert(Alert.AlertType.INFORMATION, "Saved.").show();
                 }
