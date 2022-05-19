@@ -1,7 +1,7 @@
 package controller;
 
-import bo.PurchaseOrderBO;
-import bo.PurchaseOrderBOImpl;
+import bo.custom.PurchaseOrderBO;
+import bo.custom.impl.PurchaseOrderBOImpl;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
@@ -53,8 +53,8 @@ public class PlaceOrderFormController {
     public Label lblId;
     public Label lblDate;
     public Label lblTotal;
+    PurchaseOrderBO purchaseOrderBO = new PurchaseOrderBOImpl();
     private String orderId;
-    PurchaseOrderBO purchaseOrderBO=new PurchaseOrderBOImpl();
 
     public void initialize() throws SQLException, ClassNotFoundException {
 
