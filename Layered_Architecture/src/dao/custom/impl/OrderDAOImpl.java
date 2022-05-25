@@ -2,7 +2,8 @@ package dao.custom.impl;
 
 import dao.SQLUtil;
 import dao.custom.OrderDAO;
-import model.OrderDTO;
+import dto.OrderDTO;
+import entity.Orders;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -12,17 +13,17 @@ import java.util.ArrayList;
 
 public class OrderDAOImpl implements OrderDAO {
     @Override
-    public ArrayList<OrderDTO> getAll() throws SQLException, ClassNotFoundException {
+    public ArrayList<Orders> getAll() throws SQLException, ClassNotFoundException {
         return null;
     }
 
     @Override
-    public boolean save(OrderDTO dto) throws SQLException, ClassNotFoundException {
-        return SQLUtil.executeUpdate("INSERT INTO `Orders` (oid, date, customerID) VALUES (?,?,?)", dto.getOrderId(), Date.valueOf(dto.getOrderDate()), dto.getCustomerId());
+    public boolean save(Orders entity) throws SQLException, ClassNotFoundException {
+        return SQLUtil.executeUpdate("INSERT INTO `Orders` (oid, date, customerID) VALUES (?,?,?)", entity.getOid(), Date.valueOf(entity.getDate()), entity.getCustomerID());
     }
 
     @Override
-    public boolean update(OrderDTO dto) throws SQLException, ClassNotFoundException {
+    public boolean update(Orders entity) throws SQLException, ClassNotFoundException {
         return false;
     }
 
@@ -43,16 +44,16 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public OrderDTO search(String s) throws SQLException, ClassNotFoundException {
+    public Orders search(String s) throws SQLException, ClassNotFoundException {
         return null;
     }
 
     @Override
-    public ArrayList<OrderDTO> searchByDate(LocalDate date) throws SQLException, ClassNotFoundException {
+    public ArrayList<Orders> searchByDate(LocalDate date) throws SQLException, ClassNotFoundException {
         ResultSet resultSet = SQLUtil.executeQuery("SELECT * FROM orders WHERE date=?", date);
-        ArrayList<OrderDTO> orderList=new ArrayList<>();
+        ArrayList<Orders> orderList=new ArrayList<>();
         while (resultSet.next()){
-            orderList.add(new OrderDTO(resultSet.getString(1),date,resultSet.getString(3)));
+            orderList.add(new Orders(resultSet.getString(1),date,resultSet.getString(3)));
         }
         return orderList;
     }

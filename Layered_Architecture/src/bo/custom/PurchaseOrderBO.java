@@ -1,13 +1,10 @@
 package bo.custom;
 
 import bo.SuperBO;
-import db.DBConnection;
-import model.CustomerDTO;
-import model.ItemDTO;
-import model.OrderDTO;
-import model.OrderDetailDTO;
+import dto.CustomerDTO;
+import dto.ItemDTO;
+import dto.OrderDetailDTO;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;

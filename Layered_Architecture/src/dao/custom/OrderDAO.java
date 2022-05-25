@@ -1,13 +1,13 @@
 package dao.custom;
 
 import dao.CrudDAO;
-import model.OrderDTO;
+import dto.OrderDTO;
+import entity.Orders;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public interface OrderDAO extends CrudDAO<OrderDTO,String> {
-    ArrayList<OrderDTO> searchByDate(LocalDate date) throws SQLException, ClassNotFoundException;
+public interface OrderDAO extends CrudDAO<Orders,String> {
+    ArrayList<Orders> searchByDate(LocalDate date) throws SQLException, ClassNotFoundException;
 }

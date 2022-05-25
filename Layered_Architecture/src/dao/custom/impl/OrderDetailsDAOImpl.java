@@ -2,24 +2,25 @@ package dao.custom.impl;
 
 import dao.SQLUtil;
 import dao.custom.OrderDetailsDAO;
-import model.OrderDetailDTO;
+import dto.OrderDetailDTO;
+import entity.Orderdetails;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class OrderDetailsDAOImpl implements OrderDetailsDAO {
     @Override
-    public ArrayList<OrderDetailDTO> getAll() throws SQLException, ClassNotFoundException {
+    public ArrayList<Orderdetails> getAll() throws SQLException, ClassNotFoundException {
         return null;
     }
 
     @Override
-    public boolean save(OrderDetailDTO dto) throws SQLException, ClassNotFoundException {
-        return SQLUtil.executeUpdate("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)",dto.getOid(),dto.getItemCode(),dto.getUnitPrice(),dto.getQty());
+    public boolean save(Orderdetails entity) throws SQLException, ClassNotFoundException {
+        return SQLUtil.executeUpdate("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)",entity.getOid(),entity.getItemCode(),entity.getUnitPrice(),entity.getQty());
     }
 
     @Override
-    public boolean update(OrderDetailDTO dto) throws SQLException, ClassNotFoundException {
+    public boolean update(Orderdetails entity) throws SQLException, ClassNotFoundException {
         return false;
     }
 
@@ -39,7 +40,7 @@ public class OrderDetailsDAOImpl implements OrderDetailsDAO {
     }
 
     @Override
-    public OrderDetailDTO search(String s) throws SQLException, ClassNotFoundException {
+    public Orderdetails search(String s) throws SQLException, ClassNotFoundException {
         return null;
     }
 }
